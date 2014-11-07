@@ -5,7 +5,7 @@ import ConfigParser
 import argparse
 from StringIO import StringIO
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(description="test web authorization using NTLM")
 parser.add_argument('-c','--config', help='config file')
 args = parser.parse_args()
 
