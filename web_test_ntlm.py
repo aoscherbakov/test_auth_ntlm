@@ -2,12 +2,15 @@
 
 import pycurl
 import ConfigParser
-#import argparse
-import sys
+import argparse
 from StringIO import StringIO
 
+parser = argparse.ArgumentParser()
+parser.add_argument('-c','--config', help='config file')
+args = parser.parse_args()
+
 Config = ConfigParser.ConfigParser()
-Config.read(sys.argv[1])
+Config.read(args.config)
 
 def read_conf(section):
     dict1 = {}
