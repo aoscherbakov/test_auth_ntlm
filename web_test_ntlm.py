@@ -1,16 +1,16 @@
 #!/usr/bin/python
 
+import sys,os,traceback
 import pycurl
 import ConfigParser
 import argparse
 from StringIO import StringIO
 
-parser = argparse.ArgumentParser(description="test web authorization using NTLM")
-parser.add_argument('-c','--config', help='config file')
-args = parser.parse_args()
 
-Config = ConfigParser.ConfigParser()
-Config.read(args.config)
+
+def verbose_except(e):
+       print str(e)
+       traceback.print_exc()
 
 def read_conf(section):
     dict1 = {}
@@ -34,17 +34,43 @@ def auth_test(username, password, address):
 	curl.setopt(curl.USERPWD, "{}:{}".format(username, password))
 	curl.setopt(curl.FOLLOWLOCATION, True)
 	curl.setopt(curl.WRITEDATA, curl_buffer)
-	curl.perform()
+	try:
+		curl.perform()
+	except Exception, e:
+		print "Error to perform curl auth request"
+		if args.verbose: verbose_except(e)
+		os._exit(2)
+
 	curl.close()
-	return curl_buffer.getvalue()
+	if username in curl_buffer.getvalue(): return True
 
-username = read_conf("Main")["username"]
-password = read_conf("Main")["password"]
-url = read_conf("Main")["url"]
+if __name__ == '__main__':
+    try:   
+	parser = argparse.ArgumentParser(description="test web authorization using NTLM")
+	parser.add_argument('-v','--verbose', action='store_true', default=False, help='verbose output')
+	parser.add_argument('-c','--config', help='config file', required = True)
+	args = parser.parse_args()
+	
+	Config = ConfigParser.ConfigParser()
+	Config.read(args.config)
 
-res = auth_test(username, password, url)
+	username = read_conf("Main")["username"]
+	password = read_conf("Main")["password"]
+	url = read_conf("Main")["url"]
+	
+	if auth_test(username, password, url) == True:
+		print "OK"
+		exit(0)
+	else:
+		print "Authorization Failed, Login: %s, URL: %s" % (username, url)
+		exit(2)
 
-if "Tech_fttb_acc" in res:
-    print "OK"
-else:
-    print "Authorization Failed, Login: %s, URL: %s" % (username, url)
+    except KeyboardInterrupt, e: # Ctrl-C
+       raise e
+    except SystemExit, e: # sys.exit()
+       raise e
+    except Exception, e:
+       print 'Error, UNEXPECTED EXCEPTION'
+       if args.verbose: verbose_except(e)
+       os._exit(2)
+
