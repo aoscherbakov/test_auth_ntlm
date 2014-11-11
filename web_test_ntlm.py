@@ -47,6 +47,7 @@ def auth_test(username, password, address):
 if __name__ == '__main__':
     try:   
 	parser = argparse.ArgumentParser(description="test web authorization using NTLM")
+	parser.add_argument('host', type=str, help='hostname or ip for auth test')
 	parser.add_argument('-v','--verbose', action='store_true', default=False, help='verbose output')
 	parser.add_argument('-c','--config', help='config file', required = True)
 	args = parser.parse_args()
@@ -56,8 +57,8 @@ if __name__ == '__main__':
 
 	username = read_conf("Main")["username"]
 	password = read_conf("Main")["password"]
-	url = read_conf("Main")["url"]
-	
+	url = "http://" + args.host
+
 	if auth_test(username, password, url) == True:
 		print "OK"
 		exit(0)
