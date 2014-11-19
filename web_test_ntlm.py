@@ -65,29 +65,30 @@ if __name__ == '__main__':
 	else:
 		Config.add_section('Main')
 
-	if args.timeout and not args.config:
-		timeout = args.timeout
-	else:
-		timeout = Config.get('Main','timeout')
-	
-	if args.username and not args.config:
-		username = args.username
-	else:
-		username = Config.get('Main','username')
 
-	if args.password and not args.config:
-		password = args.password
-	else:
-		password = Config.get('Main','password') 
+	for section in Config.sections():
 
-	url = "http://" + args.host
-	
-	if auth_test(username, password, url) == True:
-		print "OK"
-		exit(0)
-	else:
-		print "Authorization Failed, Login: %s, URL: %s" % (username, url)
-		exit(2)
+		if args.timeout: 
+			timeout = args.timeout
+		else:
+			timeout = Config.get(section,'timeout')
+		
+		if args.username and not args.config:
+			username = args.username
+		else:
+			username = Config.get(section, 'username')
+
+		if args.password and not args.config:
+			password = args.password
+		else:
+			password = Config.get(section, 'password') 
+
+		url = "http://" + args.host
+		
+		if auth_test(username, password, url) == True:
+			print section+" auth is OK"
+		else:
+			print section+" authorization failed, Login: %s, URL: %s" % (username, url)
 
     except KeyboardInterrupt, e: # Ctrl-C
        raise e
