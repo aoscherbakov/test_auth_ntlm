@@ -7,11 +7,12 @@ import argparse
 from StringIO import StringIO
 
 
-
+#for verbose out
 def verbose_except(e):
        print str(e)
        traceback.print_exc()
 
+#main test function
 def auth_test(username, password, address):
 	curl_buffer = StringIO()
 	curl = pycurl.Curl()
@@ -30,6 +31,7 @@ def auth_test(username, password, address):
 
 	curl.close()
 	user = username.split('@')
+	#return web page
 	if user[0] in curl_buffer.getvalue(): return True
 
 if __name__ == '__main__':
@@ -53,6 +55,7 @@ if __name__ == '__main__':
 
 	result = []
 
+	#if variable in command argument, ignore config file
 	for section in Config.sections():
 
 		if args.timeout: 
@@ -73,13 +76,14 @@ if __name__ == '__main__':
 		url = "http://" + args.host
 	
 		
-		
+		#check all config sections	
 		if auth_test(username, password, url) == True:
 			result.append(section+" auth is OK")
 		else:
 #			result.append(section+" authorization failed, Login: %s, URL: %s" % (username, url))
 			result.append(section+" authorization failed")
 		
+	#print result
 	fail = False
 	for res in result:
 		if "failed" in res:
@@ -91,6 +95,7 @@ if __name__ == '__main__':
 	else:
 		exit(0)
 
+	#exception section
     except KeyboardInterrupt, e: # Ctrl-C
        raise e
     except SystemExit, e: # sys.exit()
