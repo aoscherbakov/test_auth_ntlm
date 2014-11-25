@@ -12,21 +12,6 @@ def verbose_except(e):
        print str(e)
        traceback.print_exc()
 
-#Deprecated
-#def read_conf(section):
-#    dict1 = {}
-#    options = Config.options(section)
-#    for option in options:
-#        try:
-#            dict1[option] = Config.get(section, option)
-#            if dict1[option] == -1:
-#                DebugPrint("skip: %s" % option)
-#        except:
-#            print("exception on %s!" % option)
-#            dict1[option] = None
-#    return dict1
-
-
 def auth_test(username, password, address):
 	curl_buffer = StringIO()
 	curl = pycurl.Curl()
@@ -66,6 +51,8 @@ if __name__ == '__main__':
 		Config.add_section('Main')
 
 
+	result = []
+
 	for section in Config.sections():
 
 		if args.timeout: 
@@ -84,11 +71,25 @@ if __name__ == '__main__':
 			password = Config.get(section, 'password') 
 
 		url = "http://" + args.host
+	
+		
 		
 		if auth_test(username, password, url) == True:
-			print section+" auth is OK"
+			result.append(section+" auth is OK")
 		else:
-			print section+" authorization failed, Login: %s, URL: %s" % (username, url)
+#			result.append(section+" authorization failed, Login: %s, URL: %s" % (username, url))
+			result.append(section+" authorization failed")
+		
+	fail = False
+	for res in result:
+		if "failed" in res:
+			fail = True
+		print res
+	
+	if fail == True:
+		exit(2)
+	else:
+		exit(0)
 
     except KeyboardInterrupt, e: # Ctrl-C
        raise e
